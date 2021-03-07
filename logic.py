@@ -1,16 +1,53 @@
 from tkinter import *
 from tkinter import ttk
+
 from search_logic import search_dict
+
+from win32com.shell import shell, shellcon  
 import win32api
 import win32con
+import win32ui  
 import win32gui
-import winapps
+
+from PIL import Image, ImageTk 
 
 ################################################################################################################
 #FOR TESTING
 def printsome():
     print("henlo")
 ################################################################################################################
+
+def get_icon(PATH, size):  
+    SHGFI_ICON = 0x000000100  
+    SHGFI_ICONLOCATION = 0x000001000  
+    if size == "small":  
+        SHIL_SIZE= 0x00001  
+    elif size == "large":  
+        SHIL_SIZE= 0x00002  
+    else:  
+        raise TypeError("Invalid argument for 'size'. Must be equal to 'small' or 'large'")  
+    ret, info = shell.SHGetFileInfo(PATH, 0, SHGFI_ICONLOCATION | SHGFI_ICON | SHIL_SIZE)  
+    hIcon, iIcon, dwAttr, name, typeName = info  
+    ico_x = win32api.GetSystemMetrics(win32con.SM_CXICON)  
+    hdc = win32ui.CreateDCFromHandle(win32gui.GetDC(0))  
+    hbmp = win32ui.CreateBitmap()  
+    hbmp.CreateCompatibleBitmap(hdc, ico_x, ico_x)  
+    hdc = hdc.CreateCompatibleDC()  
+    hdc.SelectObject(hbmp)  
+    hdc.DrawIcon((0, 0), hIcon)  
+    win32gui.DestroyIcon(hIcon)  
+    
+    bmpinfo = hbmp.GetInfo()  
+    bmpstr = hbmp.GetBitmapBits(True)  
+    img = Image.frombuffer(  
+        "RGBA",  
+        (bmpinfo["bmWidth"], bmpinfo["bmHeight"]),  
+        bmpstr, "raw", "BGRA", 0, 1  
+    )  
+    
+    if size == "small":  
+        img = img.resize((16, 16), Image.ANTIALIAS)  
+    return img  
 
 def updateScrollRegion(main_frame, my_canvas):
 	main_frame.update_idletasks()
@@ -62,16 +99,28 @@ def on_enter(button_name):
 def on_leave(button_name):
     button_name['background'] = "#171717"
 
+#Make sure the icon location object exists 
+    #Maybe its better to save the icons and load them here
+images = []
 def make_button(widget,item_name,location,row_):
+
+    icon = ImageTk.PhotoImage(get_icon(location,"large"))
+    images.append(icon)
+    print(type(icon), location)
+
+
     item_name = item_name.ljust(600, " ")
     button_frame = Frame(widget, background = "#171717", borderwidth = 1, relief = FLAT)
+    icon_canv = Canvas(button_frame, width= 80, height=80)      #testing
     drawer_button = Button(button_frame, text = item_name , relief = FLAT, borderwidth=0, font = "Calibri 16", bg = "#171717", fg = 'white', activebackground="#363636" ,command = printsome, anchor="w")   #FOR TESTING
     
     drawer_button.bind("<Enter>" , lambda event : on_enter(drawer_button))
     drawer_button.bind("<Leave>" , lambda event : on_leave(drawer_button))
-    
+
+    icon_canv.create_image(20 , 20 , anchor=NW, image=icon)
     button_frame.grid(row = row_ , column = 0, sticky = 'we')
-    drawer_button.grid(row = 0 , column = 0, sticky = 'we')
+    icon_canv.grid(row = 0 , column = 1)
+    drawer_button.grid(row = 0 , column = 2, sticky = 'we')
 
 # def make_button(widget,item_name,location,row_):
 #     item_name = item_name.ljust(600, " ")

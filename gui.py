@@ -6,7 +6,6 @@ import win32con
 import win32gui
 import time
 import threading
-import winapps
 
 
 root = Tk()
