@@ -1,6 +1,8 @@
 from tkinter import *
 from tkinter import ttk
 
+from threading import Thread
+
 from search_logic import search_dict
 
 import win32api
@@ -37,7 +39,11 @@ def clear_frame(full_frame):
     # if you want to hide the empty panel then
     full_frame.pack_forget()
 
-# def search_result(root, top, search_string, my_canvas, my_scrollbar, second_frame):
+def process_createbutton(my_frame,main_frame,dict_items, key_items):
+    for row in range(len(dict_items.items())):
+        make_button(my_frame, key_items[row],dict_items[key_items[row]]['location'],dict_items[key_items[row]]['icon'], row)
+    updateScrollRegion(main_frame, my_frame)
+
 def search_result(top, search_string, my_frame, main_frame):
 
     #If search bar is empty
@@ -45,7 +51,7 @@ def search_result(top, search_string, my_frame, main_frame):
         top.withdraw()
         return 
 
-    #If search bar has some string
+    #If search bar has some string then
     top.deiconify()
     search_string = search_string.lstrip()
 
@@ -54,18 +60,19 @@ def search_result(top, search_string, my_frame, main_frame):
 
     dict_items = search_dict(search_string)
     key_items = list(dict_items)
-    
-    for row in range(len(dict_items.items())):
-        # print(dict_items,row ,'\n')
-        make_button(my_frame, key_items[row],dict_items[key_items[row]]['location'],dict_items[key_items[row]]['icon'], row)
 
-    updateScrollRegion(main_frame, my_frame)
+    #This thread removes the hanging of programing while typing.
+    button_thread = Thread(target = process_createbutton, args = (my_frame,main_frame,dict_items, key_items))
+    button_thread.start()
+    # process_createbutton(my_frame,dict_items, key_items)
 
-def on_enter(button_name):
-    button_name['background'] = "#363636"
+def on_enter(button_name,canvas_name):
+    button_name.configure(background="#363636")
+    canvas_name.configure(background="#363636")
 
-def on_leave(button_name):
-    button_name['background'] = "#171717"
+def on_leave(button_name,canvas_name):
+    button_name.configure(background="#171717")
+    canvas_name.configure(background="#171717")
 
 #Here images is used to store the references of icons. Without it icons will not be displayed.
 images = set()
@@ -76,13 +83,13 @@ def make_button(widget,item_name,location,icon,row_):
 
     item_name = item_name.ljust(600, " ")
     button_frame = Frame(widget, background = "#171717", borderwidth = 1, relief = FLAT)
-    icon_canv = Canvas(button_frame, width= 80, height=80)      #testing
+    icon_canv = Canvas(button_frame, width= 50, height=40, background= "#171717",bd=0, highlightthickness=0,relief='ridge')      #testing
     drawer_button = Button(button_frame, text = item_name , relief = FLAT, borderwidth=0, font = "Calibri 16", bg = "#171717", fg = 'white', activebackground="#363636" ,command = printsome, anchor="w")   #FOR TESTING
     
-    drawer_button.bind("<Enter>" , lambda event : on_enter(drawer_button))
-    drawer_button.bind("<Leave>" , lambda event : on_leave(drawer_button))
+    drawer_button.bind("<Enter>" , lambda event : on_enter(drawer_button,icon_canv))
+    drawer_button.bind("<Leave>" , lambda event : on_leave(drawer_button,icon_canv))
 
-    icon_canv.create_image(20 , 20 , anchor=NW, image=icon)
+    icon_canv.create_image(25 , 20 , anchor=CENTER, image=icon)
     button_frame.grid(row = row_ , column = 0, sticky = 'we')
     icon_canv.grid(row = 0 , column = 1)
     drawer_button.grid(row = 0 , column = 2, sticky = 'we')
