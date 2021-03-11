@@ -1,9 +1,3 @@
-from tkinter import *
-import win32api
-import win32con
-import tkinter.font as font
-import time
-import threading
 import winreg
 
 import glob, os

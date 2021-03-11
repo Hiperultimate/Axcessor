@@ -1,7 +1,7 @@
-# import winapps
 import os
 import glob
 import pickle
+import winreg
 
 from win32com.shell import shell, shellcon  
 import win32api
@@ -11,27 +11,6 @@ import win32gui
 
 from PIL import Image, ImageTk 
 
-"""
-Program Search Display Priority Scaling:
-        1 - Highest Priority
-        2 - Second Highest Priority
-        3 - ...
-        ...
-        10 - Least Priority
-
-"""
-
-# for app in winapps.search_installed(""):
-#     """ 
-#     C:\ProgramData\Microsoft\Windows\Start Menu\Programs        <-- This is where power toys run was getting all its file searches from
-
-#     Creates a Dictionary which contains : 
-#         File name, File Path
-    
-#     And dumps that dictionary using pickle in a file
-#     """
-#     # print(app.name)
-#     print(app)
 
 def get_icon(PATH, size):  
     SHGFI_ICON = 0x000000100  
@@ -65,6 +44,81 @@ def get_icon(PATH, size):
         img = img.resize((16, 16), Image.ANTIALIAS)  
     return img  
 
+def windows_exe_search_registry():
+    current_directory = os.getcwd()
+    try:
+        dict_file = open("search_collection.bin", "rb")
+        applications_dict = pickle.load(dict_file)
+        dict_file.close()
+    except FileNotFoundError:
+        applications_dict = {}
+
+    print("Dictionary Items : ", applications_dict.items())
+
+    access_registryLM = winreg.ConnectRegistry(None, winreg.HKEY_LOCAL_MACHINE)     #LM - Local_Machine
+    access_registryCU = winreg.ConnectRegistry(None, winreg.HKEY_CURRENT_USER)      #CU - Current_User
+
+    access_key_1 = winreg.OpenKey(access_registryLM , "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall")       #Uses "InstallLocation" for regtype
+    access_key_2 = winreg.OpenKey(access_registryLM , "SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall")       #Uses "InstallLocation" for regtype
+    access_key_3 = winreg.OpenKey(access_registryCU , "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall")       #Uses "Path" for regtype
+    access_key_4 = winreg.OpenKey(access_registryLM , "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths")       #Uses "InstallLocation" for regtype
+
+    every_key = [access_key_1,access_key_2,access_key_3,access_key_4]
+    KEYvaluename_Path = ["InstallLocation" , "Path"]
+    half_path = []
+    full_path = []
+
+    for i in range(4):
+        n = 0
+        vnPath_Switch = 0
+        if(i == 3):
+            vnPath_Switch = 1
+        while(True):
+            try:
+                f_keys = winreg.EnumKey(every_key[i],n)     #Keys under uninstall
+            except:
+                break
+            skeys = winreg.OpenKey(every_key[i] , f_keys, 0 , winreg.KEY_READ)
+            try:
+                pathname, regtype = winreg.QueryValueEx(skeys , KEYvaluename_Path[vnPath_Switch])
+                
+                if(pathname != ""):
+                    if("/" not in pathname):
+                        half_path.append(pathname)
+                    else:
+                        pathname.replace("/","\\")
+            except:
+                pass
+            n += 1
+
+    half_path = list(set(half_path))
+    for i in range(len(half_path)):
+        temp_encode = (half_path[i])
+        try:
+            os.chdir(temp_encode)       #os.chdir changes the current working directory to the given path.
+            allexeList = (glob.glob("**/*.exe" , recursive= True))
+            if(temp_encode[-1] != "\\"):
+                full_path.extend( [os.sep.join([half_path[i], str(x)]) for x in allexeList])
+            else:
+                full_path.extend([f"{half_path[i]}{str(x)}" for x in allexeList])
+        except Exception as e:
+                pass
+    full_path = list(set(full_path))
+
+    # applications_dict = {}
+    for file_path in full_path:
+        name = os.path.basename(os.path.normpath(file_path)[:-4])
+        location = file_path
+        icon = get_icon(location,"large")
+        applications_dict[name] = {}
+        applications_dict[name]['location'] =  location
+        applications_dict[name]['icon'] =  icon
+
+    dump_tofile = open(current_directory+'\\search_collection.bin', 'wb') 
+    pickle.dump(applications_dict, dump_tofile)
+    dump_tofile.close()
+    os.chdir(current_directory)
+
 def windows_search_startmenu():
     """
     For Start Menu Search Only
@@ -72,7 +126,13 @@ def windows_search_startmenu():
     Gets all shortcuts name and address located on the location (search_location) and stores it a dictionary and dumps it 
 
     """
-    applications_dict = {}
+    try:
+        dict_file = open("search_collection.bin", "rb")
+        applications_dict = pickle.load(dict_file)
+        dict_file.close()
+    except FileNotFoundError:
+        applications_dict = {}
+    
     search_location = r"C:\ProgramData\Microsoft\Windows\Start Menu\Programs"
 
     current_directory = os.getcwd()
@@ -88,7 +148,7 @@ def windows_search_startmenu():
         applications_dict[name]['icon'] =  icon
 
 
-    dump_tofile = open(current_directory+'\\search_collection.bin', 'ab') 
+    dump_tofile = open(current_directory+'\\search_collection.bin', 'wb') 
     pickle.dump(applications_dict, dump_tofile)
     dump_tofile.close()
     os.chdir(current_directory)
@@ -108,11 +168,7 @@ def search_dict(search_string):
     search_result = {keys : {'location':applications_dict[keys]["location"], 'icon': applications_dict[keys]["icon"] } for keys in applications_dict.keys() if search_string.lower() in keys.lower()}
     return(search_result)
 
-    # for keys in applications_dict.keys():
-    #     if(search.lower() in keys.lower()):
-    #         print(keys , " ", applications_dict[keys]['location'])
-    # search_result = [(keys, applications_dict[keys]["location"]) for keys in applications_dict.keys() if search in keys]
 
-
-windows_search_startmenu()
+# windows_exe_search_registry()
+# windows_search_startmenu()
 # search_dict("valo")

@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import ttk
 
 from threading import Thread
+import threading
 
 from search_logic import search_dict
 
@@ -63,7 +64,15 @@ def search_result(top, search_string, my_frame, main_frame):
 
     #This thread removes the hanging of programing while typing.
     button_thread = Thread(target = process_createbutton, args = (my_frame,main_frame,dict_items, key_items))
+    # print(threading.activeCount())
+    # print(threading.enumerate())
+    # if(button_thread.is_alive()):
+    #     print("Alive")
+    
     button_thread.start()
+    # print(threading.activeCount())
+    # button_thread._stop()
+    # print(threading.activeCount())
     # process_createbutton(my_frame,dict_items, key_items)
 
 def on_enter(button_name,canvas_name):
