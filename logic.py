@@ -6,6 +6,8 @@ import threading
 
 from search_logic import search_dict
 
+from googlesearch import search
+
 import win32api
 import win32con 
 import win32gui
@@ -64,16 +66,7 @@ def search_result(top, search_string, my_frame, main_frame):
 
     #This thread removes the hanging of programing while typing.
     button_thread = Thread(target = process_createbutton, args = (my_frame,main_frame,dict_items, key_items))
-    # print(threading.activeCount())
-    # print(threading.enumerate())
-    # if(button_thread.is_alive()):
-    #     print("Alive")
-    
     button_thread.start()
-    # print(threading.activeCount())
-    # button_thread._stop()
-    # print(threading.activeCount())
-    # process_createbutton(my_frame,dict_items, key_items)
 
 def on_enter(button_name,canvas_name):
     button_name.configure(background="#363636")
@@ -102,9 +95,3 @@ def make_button(widget,item_name,location,icon,row_):
     button_frame.grid(row = row_ , column = 0, sticky = 'we')
     icon_canv.grid(row = 0 , column = 1)
     drawer_button.grid(row = 0 , column = 2, sticky = 'we')
-
-# def make_button(widget,item_name,location,row_):
-#     item_name = item_name.ljust(600, " ")
-#     drawer_button = Button(widget, text = item_name , relief = FLAT, font = "Calibri 16", bg = "#171717",fg = 'white' ,command = printsome, anchor="w")   #FOR TESTING
-#     drawer_button.grid(row = row_ , column = 0, sticky = 'we', pady= 8, padx=8)
-#     drawer_button.config(highlightbackground='PINK')
