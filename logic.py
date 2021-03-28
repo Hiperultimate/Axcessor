@@ -4,9 +4,11 @@ from tkinter import ttk
 from threading import Thread
 import threading
 
+import time
+
 from search_logic import search_dict
 
-from googlesearch import search
+from web_search import google_results
 
 import win32api
 import win32con 
@@ -44,8 +46,35 @@ def clear_frame(full_frame):
 
 def process_createbutton(my_frame,main_frame,dict_items, key_items):
     for row in range(len(dict_items.items())):
-        make_button(my_frame, key_items[row],dict_items[key_items[row]]['location'],dict_items[key_items[row]]['icon'], row)
+        #Here try except block handles overlapping of button creation 
+        try:
+            make_button(my_frame, key_items[row],dict_items[key_items[row]]['location'],dict_items[key_items[row]]['icon'], row)
+        except:
+            pass
     updateScrollRegion(main_frame, my_frame)
+
+def process_webbuttons(my_frame,main_frame,dict_items, key_items):
+    for row in range(len(dict_items.items())):
+        web_button(my_frame,key_items[row] , dict_items[key_items[row]]['hyper_links'], dict_items[key_items[row]]['description'], row)
+    updateScrollRegion(main_frame, my_frame)
+
+check_string = ""
+def check_string_delay(search_value,top,my_frame,main_frame):
+    global check_string
+    print(check_string," ", search_value)
+    if(check_string == search_value):
+        print("Same")
+        results_=google_results(check_string)
+        # print(results_)
+
+        top.deiconify()
+        check_string = check_string.lstrip()
+
+        button_thread = Thread(target = process_webbuttons, args = (my_frame,main_frame,results_, list(results_)))
+        button_thread.start()
+    else:
+        print("Not same")
+    
 
 def search_result(top, search_string, my_frame, main_frame):
 
@@ -53,7 +82,23 @@ def search_result(top, search_string, my_frame, main_frame):
     if(search_string == "" or len(search_string.replace(" ","")) == 0):
         top.withdraw()
         return 
+    
+    if(search_string.lstrip()[:2] == "s/"):
+        global check_string
+        # print("websearching")
+        clear_frame(my_frame)
 
+        search_value = search_string.lstrip()[2:]
+        check_string = search_value
+
+        if(check_string == ""):
+            return
+        t = threading.Timer(0.4,check_string_delay,[check_string,top,my_frame,main_frame])
+        t.start()
+
+        return
+
+    print("passed")
     #If search bar has some string then
     top.deiconify()
     search_string = search_string.lstrip()
@@ -76,7 +121,7 @@ def on_leave(button_name,canvas_name):
     button_name.configure(background="#171717")
     canvas_name.configure(background="#171717")
 
-#Here images is used to store the references of icons. Without it icons will not be displayed.
+#Here "images" variable is used to store the references of icons. Without it icons will not be displayed.
 images = set()
 def make_button(widget,item_name,location,icon,row_):
     icon = ImageTk.PhotoImage(icon)
@@ -94,4 +139,15 @@ def make_button(widget,item_name,location,icon,row_):
     icon_canv.create_image(25 , 20 , anchor=CENTER, image=icon)
     button_frame.grid(row = row_ , column = 0, sticky = 'we')
     icon_canv.grid(row = 0 , column = 1)
+    drawer_button.grid(row = 0 , column = 2, sticky = 'we')
+
+def web_button(widget, item_heading,item_url,item_description,row_):
+    item_heading = item_heading.ljust(600, " ")
+    button_frame = Frame(widget, background = "#171717", borderwidth = 1, relief = FLAT)
+    drawer_button = Button(button_frame, text = item_heading , relief = FLAT, borderwidth=0, font = "Calibri 16", bg = "#171717", fg = 'white', activebackground="#363636" ,command = printsome, anchor="w")   #FOR TESTING
+    # print(item_heading)
+    # print(item_url)
+    # print(item_description)
+
+    button_frame.grid(row = row_ , column = 0, sticky = 'we')
     drawer_button.grid(row = 0 , column = 2, sticky = 'we')

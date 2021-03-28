@@ -82,6 +82,6 @@ def google_results(search_string):
     return(parsed_info)
 
     
-google_results("Parsing made easy")
+# google_results("Parsing made easy")
 # google_results("Create paper planes")
 
