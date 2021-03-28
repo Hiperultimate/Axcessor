@@ -58,24 +58,34 @@ def process_webbuttons(my_frame,main_frame,dict_items, key_items):
         web_button(my_frame,key_items[row] , dict_items[key_items[row]]['hyper_links'], dict_items[key_items[row]]['description'], row)
     updateScrollRegion(main_frame, my_frame)
 
-check_string = ""
-def check_string_delay(search_value,top,my_frame,main_frame):
-    global check_string
-    print(check_string," ", search_value)
-    if(check_string == search_value):
-        print("Same")
-        results_=google_results(check_string)
-        # print(results_)
+# If get_websearch_makebutton is not working properly in the future, this code is for reverting back to it
+    #and some primitive code in ssearch_result as which uses global check_string
+# check_string = ""
+# def check_string_delay(search_value,top,my_frame,main_frame):
+#     global check_string
+#     print(check_string," ", search_value)
+#     if(check_string == search_value):
+#         print("Same")
+#         results_=google_results(check_string)
+#         # print(results_)
 
-        top.deiconify()
-        check_string = check_string.lstrip()
+#         top.deiconify()
+#         check_string = check_string.lstrip()
 
-        button_thread = Thread(target = process_webbuttons, args = (my_frame,main_frame,results_, list(results_)))
-        button_thread.start()
-    else:
-        print("Not same")
-    
+#         button_thread = Thread(target = process_webbuttons, args = (my_frame,main_frame,results_, list(results_)))
+#         button_thread.start()
+#     else:
+#         print("Not same")
 
+def get_websearch_makebutton(web_search_text,top,my_frame,main_frame):
+    results_=google_results(web_search_text)
+
+    top.deiconify()
+
+    button_thread = Thread(target = process_webbuttons, args = (my_frame,main_frame,results_, list(results_)))
+    button_thread.start()
+
+timer_function = threading.Timer(1, lambda *args: None)
 def search_result(top, search_string, my_frame, main_frame):
 
     #If search bar is empty
@@ -84,17 +94,20 @@ def search_result(top, search_string, my_frame, main_frame):
         return 
     
     if(search_string.lstrip()[:2] == "s/"):
-        global check_string
+        # global check_string
         # print("websearching")
         clear_frame(my_frame)
 
         search_value = search_string.lstrip()[2:]
-        check_string = search_value
+        # check_string = search_value
 
-        if(check_string == ""):
+        if(search_value == ""):
             return
-        t = threading.Timer(0.4,check_string_delay,[check_string,top,my_frame,main_frame])
-        t.start()
+        global timer_function
+        timer_function.cancel()
+        # timer_function = threading.Timer(0.4,check_string_delay,[check_string,top,my_frame,main_frame])
+        timer_function = threading.Timer(0.3,get_websearch_makebutton,[search_value,top,my_frame,main_frame])
+        timer_function.start()
 
         return
 
@@ -109,7 +122,7 @@ def search_result(top, search_string, my_frame, main_frame):
     dict_items = search_dict(search_string)
     key_items = list(dict_items)
 
-    #This thread removes the hanging of programing while typing.
+    #This thread removes the hanging of program while typing because threading does not interfere with tkinter's loop.
     button_thread = Thread(target = process_createbutton, args = (my_frame,main_frame,dict_items, key_items))
     button_thread.start()
 
