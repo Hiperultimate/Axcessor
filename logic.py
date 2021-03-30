@@ -54,9 +54,10 @@ def process_createbutton(my_frame,main_frame,dict_items, key_items):
             pass
     updateScrollRegion(main_frame, my_frame)
 
-def process_webbuttons(top,my_frame,main_frame,dict_items, key_items):
+def process_webbuttons(my_frame,main_frame,dict_items, key_items):
+    clear_frame(my_frame)
     for row in range(len(dict_items.items())):
-        web_button(top,my_frame,key_items[row] , dict_items[key_items[row]]['hyper_links'], dict_items[key_items[row]]['description'], row)
+        web_button(my_frame,key_items[row] , dict_items[key_items[row]]['hyper_links'], dict_items[key_items[row]]['description'], row)
     updateScrollRegion(main_frame, my_frame)
 
 
@@ -65,7 +66,7 @@ def get_websearch_makebutton(web_search_text,top,my_frame,main_frame):
 
     top.deiconify()
 
-    button_thread = Thread(target = process_webbuttons, args = (top,my_frame,main_frame,results_, list(results_)))
+    button_thread = Thread(target = process_webbuttons, args = (my_frame,main_frame,results_, list(results_)))
     button_thread.start()
 
 timer_function = Timer(1, lambda *args: None)
@@ -113,7 +114,6 @@ def on_leave(button_name,canvas_name):
     canvas_name.configure(background="#171717")
 
 def browse_click(url):
-    print(url)
     webbrowser.open(url, new=0, autoraise=True)
 
 #Here "images" variable is used to store the references of icons. Without it icons will not be displayed.
@@ -121,7 +121,6 @@ images = set()
 def make_button(widget,item_name,location,icon,row_):
     icon = ImageTk.PhotoImage(icon)
     images.add(icon)
-
 
     item_name = item_name.ljust(600, " ")
     button_frame = Frame(widget, background = "#171717", borderwidth = 1, relief = FLAT)
@@ -136,19 +135,13 @@ def make_button(widget,item_name,location,icon,row_):
     icon_canv.grid(row = 0 , column = 1)
     drawer_button.grid(row = 0 , column = 2, sticky = 'we')
 
-def web_button(top, widget, item_heading,item_url,item_description,row_):
+def web_button(widget, item_heading,item_url,item_description,row_):
     item_description = "\n".join(textwrap.wrap(item_description,width = 95)) + " "*200
-
     item_heading = item_heading.ljust(600, " ")
-    # button_frame = Canvas(widget, width= 200, height=500, background= "#FFFFFF",bd=0, highlightthickness=0,relief='ridge')
+
     button_frame = Frame(widget, background = "#171717", borderwidth = 3, relief = FLAT)
     heading_text = Label(button_frame, text = item_heading,anchor=NW,justify=LEFT, bg = "#171717",font = "Calibri 18",fg = 'white')
     description_text = Label(button_frame, text = item_description,anchor=NW, justify=LEFT, bg = "#171717",font = "Calibri 14",fg = 'white')
-    # button_frame = Frame(widget, background = "#171717", borderwidth = 1, relief = FLAT)
-    # drawer_button = Button(button_frame, text = item_heading , relief = FLAT, borderwidth=0, font = "Calibri 16", bg = "#171717", fg = 'white', activebackground="#363636" ,command = printsome, anchor="w")   #FOR TESTING
-    # print(item_heading)
-    # print(item_url)
-    # print(item_description)
 
     button_frame.bind("<Enter>" , lambda event : on_enter(heading_text,description_text))
     button_frame.bind("<Leave>" , lambda event : on_leave(heading_text,description_text))
@@ -159,9 +152,3 @@ def web_button(top, widget, item_heading,item_url,item_description,row_):
     
     heading_text.grid(row=0,column=0,sticky="w")
     description_text.grid(row=1,column=0,sticky="w")
-    # heading_text.pack(side=LEFT)
-    # description_text.pack(side=LEFT)
-
-    # Grid.rowconfigure(button_frame,row_,weight=1)
-
-    # drawer_button.grid(row = 0 , column = 0, sticky = N+S+E+W )
