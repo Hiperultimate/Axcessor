@@ -66,6 +66,8 @@ searchbar_border.grid_columnconfigure(0, weight = 1)
 root.grid_columnconfigure(0, weight=8)
 root.grid_columnconfigure(1, weight=1)
 top.grid_columnconfigure(0, weight=8)
+# top.grid_rowconfigure(0, weight=8)
+
 
 #This function detects the hotkey (shift+ctrl) and will be used to open and close up the program's GUI
 def open_close():
