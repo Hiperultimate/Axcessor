@@ -57,7 +57,10 @@ def process_createbutton(my_frame,main_frame,dict_items, key_items):
 def process_webbuttons(my_frame,main_frame,dict_items, key_items):
     clear_frame(my_frame)
     for row in range(len(dict_items.items())):
-        web_button(my_frame,key_items[row] , dict_items[key_items[row]]['hyper_links'], dict_items[key_items[row]]['description'], row)
+        try:
+            web_button(my_frame,key_items[row] , dict_items[key_items[row]]['hyper_links'], dict_items[key_items[row]]['description'], row)
+        except:
+            pass
     updateScrollRegion(main_frame, my_frame)
 
 
@@ -105,13 +108,15 @@ def search_result(top, search_string, my_frame, main_frame):
     button_thread = Thread(target = process_createbutton, args = (my_frame,main_frame,dict_items, key_items))
     button_thread.start()
 
-def on_enter(button_name,canvas_name):
-    button_name.configure(background="#363636")
-    canvas_name.configure(background="#363636")
 
-def on_leave(button_name,canvas_name):
-    button_name.configure(background="#171717")
-    canvas_name.configure(background="#171717")
+def on_enter(*args):
+    for widget in args:
+        widget.configure(background="#363636")
+
+def on_leave(*args):
+    for widget in args:
+        widget.configure(background="#171717")
+
 
 def browse_click(url):
     webbrowser.open(url, new=0, autoraise=True)
@@ -124,16 +129,18 @@ def make_button(widget,item_name,location,icon,row_):
 
     item_name = item_name.ljust(600, " ")
     button_frame = Frame(widget, background = "#171717", borderwidth = 1, relief = FLAT)
-    icon_canv = Canvas(button_frame, width= 50, height=40, background= "#171717",bd=0, highlightthickness=0,relief='ridge')      #testing
-    drawer_button = Button(button_frame, text = item_name , relief = FLAT, borderwidth=0, font = "Calibri 16", bg = "#171717", fg = 'white', activebackground="#363636" ,command = printsome, anchor="w")   #FOR TESTING
-    
-    drawer_button.bind("<Enter>" , lambda event : on_enter(drawer_button,icon_canv))
-    drawer_button.bind("<Leave>" , lambda event : on_leave(drawer_button,icon_canv))
+    drawer_icon = Label(button_frame,image=icon,bg = "#171717")
+    drawer_button = Label(button_frame, text = item_name, anchor=W, bg = "#171717",font = "Calibri 18",fg = 'white')
 
-    icon_canv.create_image(25 , 20 , anchor=CENTER, image=icon)
+    button_frame.bind("<Enter>" , lambda event : on_enter(drawer_button,drawer_icon,button_frame))
+    button_frame.bind("<Leave>" , lambda event : on_leave(drawer_button,drawer_icon,button_frame))
+    drawer_icon.bind("<Button-1>" , lambda event : printsome())
+    drawer_button.bind("<Button-1>" , lambda event : printsome())
+
     button_frame.grid(row = row_ , column = 0, sticky = 'we')
-    icon_canv.grid(row = 0 , column = 1)
-    drawer_button.grid(row = 0 , column = 2, sticky = 'we')
+    drawer_icon.grid(row = 0 , column = 1,ipadx=5,ipady=5)
+    drawer_button.grid(row = 0 , column = 2, sticky = 'we',ipadx=5,ipady=5)
+
 
 def web_button(widget, item_heading,item_url,item_description,row_):
     item_description = "\n".join(textwrap.wrap(item_description,width = 95)) + " "*200
