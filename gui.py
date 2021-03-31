@@ -11,7 +11,6 @@ import threading
 root = Tk()
 
 root.overrideredirect(True)
-root.columnconfigure(1,weight = 1)
 root.configure(background='black')
 
 #Search Bar Size
@@ -63,10 +62,8 @@ top.bind_all("<MouseWheel>",_on_mousewheel)
 
 #Grid Config Block
 searchbar_border.grid_columnconfigure(0, weight = 1)
-root.grid_columnconfigure(0, weight=8)
-root.grid_columnconfigure(1, weight=1)
+root.grid_columnconfigure(0, weight=1)
 top.grid_columnconfigure(0, weight=8)
-# top.grid_rowconfigure(0, weight=8)
 
 
 #This function detects the hotkey (shift+ctrl) and will be used to open and close up the program's GUI
@@ -82,7 +79,6 @@ def open_close():
                 toggling = 1
             print("Activated :" , toggling)
             while(win32api.GetAsyncKeyState(win32con.VK_CONTROL) == -32768 or win32api.GetAsyncKeyState(win32con.VK_SHIFT) == -32768):
-                # time.sleep(0.05)
                 continue
         if(toggling == 0):
             if(once_counter == 1):

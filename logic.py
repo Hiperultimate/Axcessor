@@ -3,9 +3,13 @@ from tkinter import ttk
 
 from threading import Thread, Timer
 
+import time
+
 import textwrap
 
 import webbrowser
+
+from os import startfile
 
 from search_logic import search_dict
 
@@ -17,11 +21,7 @@ import win32gui
 
 from PIL import ImageTk 
 
-################################################################################################################
-#FOR TESTING
-def printsome():
-    print("henlo")
-################################################################################################################
+
 
 def updateScrollRegion(main_frame, my_canvas):
 	main_frame.update_idletasks()
@@ -117,9 +117,17 @@ def on_leave(*args):
     for widget in args:
         widget.configure(background="#171717")
 
+def minimize():
+    win32api.keybd_event(0x10, 0,0,0)   #0x0D - shift
+    win32api.keybd_event(0x11, 0,0,0)   #0x11 - ctrl
+    time.sleep(0.1)
+    win32api.keybd_event(0x10,0 ,win32con.KEYEVENTF_KEYUP ,0)
+    win32api.keybd_event(0x11,0 ,win32con.KEYEVENTF_KEYUP ,0)
+    time.sleep(0.1)
 
-def browse_click(url):
-    webbrowser.open(url, new=0, autoraise=True)
+def open_file(file_address):
+    startfile(file_address)
+    Thread(target=minimize).start()
 
 #Here "images" variable is used to store the references of icons. Without it icons will not be displayed.
 images = set()
@@ -134,13 +142,17 @@ def make_button(widget,item_name,location,icon,row_):
 
     button_frame.bind("<Enter>" , lambda event : on_enter(drawer_button,drawer_icon,button_frame))
     button_frame.bind("<Leave>" , lambda event : on_leave(drawer_button,drawer_icon,button_frame))
-    drawer_icon.bind("<Button-1>" , lambda event : printsome())
-    drawer_button.bind("<Button-1>" , lambda event : printsome())
+    drawer_icon.bind("<Button-1>" , lambda event : open_file(location))
+    drawer_button.bind("<Button-1>" , lambda event : open_file(location))
 
     button_frame.grid(row = row_ , column = 0, sticky = 'we')
     drawer_icon.grid(row = 0 , column = 1,ipadx=5,ipady=5)
     drawer_button.grid(row = 0 , column = 2, sticky = 'we',ipadx=5,ipady=5)
 
+
+def browse_click(url):
+    webbrowser.open(url, new=0, autoraise=True)
+    Thread(target=minimize).start()
 
 def web_button(widget, item_heading,item_url,item_description,row_):
     item_description = "\n".join(textwrap.wrap(item_description,width = 95)) + " "*200
