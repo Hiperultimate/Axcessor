@@ -7,6 +7,8 @@ import win32gui
 import time
 import threading
 
+from search_logic import windows_exe_search_registry, windows_search_startmenu
+
 
 root = Tk()
 
@@ -21,19 +23,17 @@ y_size = 35 + Screen_Height/36
 x_pos = Screen_Width/2 - x_size/2
 y_pos = Screen_Height/2 - y_size/2 - Screen_Height/5
 root.geometry("%dx%d+%d+%d" % (x_size,y_size,x_pos,y_pos))
-print(x_size,y_size,x_pos,y_pos)
+# print(x_size,y_size,x_pos,y_pos)
 
 #Search Drawer
 top = Toplevel(root, bg = 'black')
 top.overrideredirect(True)
 Screen_Width = root.winfo_screenwidth()
 Screen_Height = root.winfo_screenheight()
-x_size = 600 + Screen_Width/9
-# y_size = 35 + Screen_Height/36    
+x_size = 600 + Screen_Width/9  
 y_size = 300 + Screen_Height/36     #For testing
 y_pos = Screen_Height/2 - y_size/2 - Screen_Height/8 + 135     #For testing
 x_pos = Screen_Width/2 - x_size/2
-# y_pos = Screen_Height/2 - y_size/2 - Screen_Height/8
 top.geometry("%dx%d+%d+%d" % (x_size,y_size,x_pos,y_pos))
 
 #All Created Widgets block
@@ -65,6 +65,13 @@ searchbar_border.grid_columnconfigure(0, weight = 1)
 root.grid_columnconfigure(0, weight=1)
 top.grid_columnconfigure(0, weight=8)
 
+#Checks if search_collection exists or not. If not, then creates one.
+try:
+    dict_file = open("search_collection.bin", "rb")
+    dict_file.close()
+except FileNotFoundError:
+    windows_search_startmenu()
+    windows_exe_search_registry()
 
 #This function detects the hotkey (shift+ctrl) and will be used to open and close up the program's GUI
 def open_close():

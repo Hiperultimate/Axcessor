@@ -3,13 +3,13 @@ import glob
 import pickle
 import winreg
 
-from win32com.shell import shell, shellcon  
+from win32com.shell import shell
 import win32api
 import win32con
 import win32ui  
 import win32gui
 
-from PIL import Image, ImageTk 
+from PIL import Image
 
 
 def get_icon(PATH, size):  
@@ -53,12 +53,6 @@ def windows_search_startmenu():
     Overwrites all existing contents in search_collection.bin file
 
     """
-    # try:
-    #     dict_file = open("search_collection.bin", "rb")
-    #     applications_dict = pickle.load(dict_file)
-    #     dict_file.close()
-    # except FileNotFoundError:
-    #     applications_dict = {}
         
     applications_dict = {}
     

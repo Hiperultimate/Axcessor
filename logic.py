@@ -26,12 +26,6 @@ import keyboard
 from PIL import ImageTk 
 
 def minimize():
-    # win32api.keybd_event(0x0D, 0,0,0) #space   #0x0D - shift
-    # win32api.keybd_event(0x5B, 0,0,0) #alt  #0x11 - ctrl
-    # time.sleep(0.2)
-    # win32api.keybd_event(0x0D,0 ,win32con.KEYEVENTF_KEYUP ,0)
-    # win32api.keybd_event(0x5B,0 ,win32con.KEYEVENTF_KEYUP ,0)
-    # time.sleep(0.2)
     keyboard.press('win+shift')
     time.sleep(0.1)
     keyboard.release('win+shift')
