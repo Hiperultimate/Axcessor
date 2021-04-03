@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import ttk
+from tkinter import messagebox
 
 from threading import Thread, Timer
 
@@ -14,14 +15,26 @@ from os import startfile
 from search_logic import search_dict
 
 from web_search import google_results
+from search_logic import windows_exe_search_registry, windows_search_startmenu
 
 import win32api
 import win32con 
 import win32gui
 
+import keyboard
+
 from PIL import ImageTk 
 
-
+def minimize():
+    # win32api.keybd_event(0x0D, 0,0,0) #space   #0x0D - shift
+    # win32api.keybd_event(0x5B, 0,0,0) #alt  #0x11 - ctrl
+    # time.sleep(0.2)
+    # win32api.keybd_event(0x0D,0 ,win32con.KEYEVENTF_KEYUP ,0)
+    # win32api.keybd_event(0x5B,0 ,win32con.KEYEVENTF_KEYUP ,0)
+    # time.sleep(0.2)
+    keyboard.press('win+shift')
+    time.sleep(0.1)
+    keyboard.release('win+shift')
 
 def updateScrollRegion(main_frame, my_canvas):
 	main_frame.update_idletasks()
@@ -63,7 +76,6 @@ def process_webbuttons(my_frame,main_frame,dict_items, key_items):
             pass
     updateScrollRegion(main_frame, my_frame)
 
-
 def get_websearch_makebutton(web_search_text,top,my_frame,main_frame):
     results_=google_results(web_search_text)
 
@@ -80,6 +92,21 @@ def search_result(top, search_string, my_frame, main_frame):
         top.withdraw()
         return 
     
+    if(search_string.lstrip() == "/rebuild/"):
+
+        button_frame = Frame(my_frame, background = "#171717", borderwidth = 3, relief = FLAT)
+        heading_text = Label(button_frame, text = "Rebuilding Search Collection. Please Wait...",anchor=NW,justify=LEFT, bg = "#171717",font = "Calibri 18",fg = 'white')
+        button_frame.grid(row = 0 , column = 0, sticky = 'we')
+        heading_text.grid(row=0,column=0,sticky="w")
+
+        button_frame.update()
+
+        windows_search_startmenu()
+        windows_exe_search_registry()
+
+        messagebox.showinfo("Rebuild","Rebuilding complete!")
+        
+        
     if(search_string.lstrip()[:2] == "s/"):
         clear_frame(my_frame)
 
@@ -117,17 +144,10 @@ def on_leave(*args):
     for widget in args:
         widget.configure(background="#171717")
 
-def minimize():
-    win32api.keybd_event(0x10, 0,0,0)   #0x0D - shift
-    win32api.keybd_event(0x11, 0,0,0)   #0x11 - ctrl
-    time.sleep(0.1)
-    win32api.keybd_event(0x10,0 ,win32con.KEYEVENTF_KEYUP ,0)
-    win32api.keybd_event(0x11,0 ,win32con.KEYEVENTF_KEYUP ,0)
-    time.sleep(0.1)
-
 def open_file(file_address):
-    startfile(file_address)
     Thread(target=minimize).start()
+    startfile(file_address)
+    
 
 #Here "images" variable is used to store the references of icons. Without it icons will not be displayed.
 images = set()

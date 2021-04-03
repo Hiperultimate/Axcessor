@@ -71,14 +71,14 @@ def open_close():
     toggling = 1
     once_counter = 0    #Stops toggling code to run more than once after toggling changes
     while True:
-        if(win32api.GetAsyncKeyState(win32con.VK_CONTROL) == -32768 and win32api.GetAsyncKeyState(win32con.VK_SHIFT) == -32768):
+        if(win32api.GetAsyncKeyState(win32con.VK_LWIN) == -32768 and win32api.GetAsyncKeyState(win32con.VK_SHIFT) == -32768):
             if(toggling == 1):
                 toggling = 0 
                 search_bar.delete(0,'end')  #Deletes all text from the entry once the axcessor is minimized.
             elif(toggling == 0):
                 toggling = 1
             print("Activated :" , toggling)
-            while(win32api.GetAsyncKeyState(win32con.VK_CONTROL) == -32768 or win32api.GetAsyncKeyState(win32con.VK_SHIFT) == -32768):
+            while(win32api.GetAsyncKeyState(win32con.VK_LWIN) == -32768 or win32api.GetAsyncKeyState(win32con.VK_SHIFT) == -32768):
                 continue
         if(toggling == 0):
             if(once_counter == 1):

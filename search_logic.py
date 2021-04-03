@@ -44,8 +44,47 @@ def get_icon(PATH, size):
         img = img.resize((16, 16), Image.ANTIALIAS)  
     return img  
 
+def windows_search_startmenu():
+    """
+    For Start Menu Search Only
+    
+    Gets all shortcuts name and address located on the location (search_location) and stores it a dictionary and dumps it 
+
+    Overwrites all existing contents in search_collection.bin file
+
+    """
+    # try:
+    #     dict_file = open("search_collection.bin", "rb")
+    #     applications_dict = pickle.load(dict_file)
+    #     dict_file.close()
+    # except FileNotFoundError:
+    #     applications_dict = {}
+        
+    applications_dict = {}
+    
+    search_location = r"C:\ProgramData\Microsoft\Windows\Start Menu\Programs"
+
+    current_directory = os.getcwd()
+    os.chdir(search_location)
+    all_shortcut_list = (glob.glob("**/*.lnk" , recursive= True))
+    
+    for shortcuts in all_shortcut_list:
+        name = os.path.basename(os.path.normpath(shortcuts)[:-4])
+        location = os.sep.join([search_location, str(shortcuts)])
+        icon = get_icon(location,"large")
+        applications_dict[name] = {}
+        applications_dict[name]['location'] =  location
+        applications_dict[name]['icon'] =  icon
+
+
+    dump_tofile = open(current_directory+'\\search_collection.bin', 'wb') 
+    pickle.dump(applications_dict, dump_tofile)
+    dump_tofile.close()
+    os.chdir(current_directory)
+
 def windows_exe_search_registry():
     current_directory = os.getcwd()
+    print(current_directory)
     try:
         dict_file = open("search_collection.bin", "rb")
         applications_dict = pickle.load(dict_file)
@@ -53,7 +92,7 @@ def windows_exe_search_registry():
     except FileNotFoundError:
         applications_dict = {}
 
-    print("Dictionary Items : ", applications_dict.items())
+    # print("Dictionary Items : ", applications_dict.items())
 
     access_registryLM = winreg.ConnectRegistry(None, winreg.HKEY_LOCAL_MACHINE)     #LM - Local_Machine
     access_registryCU = winreg.ConnectRegistry(None, winreg.HKEY_CURRENT_USER)      #CU - Current_User
@@ -119,40 +158,6 @@ def windows_exe_search_registry():
     dump_tofile.close()
     os.chdir(current_directory)
 
-def windows_search_startmenu():
-    """
-    For Start Menu Search Only
-    
-    Gets all shortcuts name and address located on the location (search_location) and stores it a dictionary and dumps it 
-
-    """
-    try:
-        dict_file = open("search_collection.bin", "rb")
-        applications_dict = pickle.load(dict_file)
-        dict_file.close()
-    except FileNotFoundError:
-        applications_dict = {}
-    
-    search_location = r"C:\ProgramData\Microsoft\Windows\Start Menu\Programs"
-
-    current_directory = os.getcwd()
-    os.chdir(search_location)
-    all_shortcut_list = (glob.glob("**/*.lnk" , recursive= True))
-    
-    for shortcuts in all_shortcut_list:
-        name = os.path.basename(os.path.normpath(shortcuts)[:-4])
-        location = os.sep.join([search_location, str(shortcuts)])
-        icon = get_icon(location,"large")
-        applications_dict[name] = {}
-        applications_dict[name]['location'] =  location
-        applications_dict[name]['icon'] =  icon
-
-
-    dump_tofile = open(current_directory+'\\search_collection.bin', 'wb') 
-    pickle.dump(applications_dict, dump_tofile)
-    dump_tofile.close()
-    os.chdir(current_directory)
-
 def search_dict(search_string):
     """
     Get dumped dictionary and search for substrings
@@ -162,13 +167,12 @@ def search_dict(search_string):
                     print(a_dict[keys])
     """
 
-    print(os.getcwd())
+    # print(os.getcwd())
     dict_file = open("search_collection.bin", "rb")
     applications_dict = pickle.load(dict_file)
     search_result = {keys : {'location':applications_dict[keys]["location"], 'icon': applications_dict[keys]["icon"] } for keys in applications_dict.keys() if search_string.lower() in keys.lower()}
     return(search_result)
 
-
-# windows_exe_search_registry()
 # windows_search_startmenu()
+# windows_exe_search_registry()
 # search_dict("valo")
