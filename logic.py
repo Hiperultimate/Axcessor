@@ -53,10 +53,11 @@ def clear_frame(full_frame):
     full_frame.pack_forget()
 
 def process_createbutton(my_frame,main_frame,dict_items, key_items):
+    clear_frame(my_frame)
     for row in range(len(dict_items.items())):
         #Here try except block handles overlapping of button creation 
         try:
-            make_button(my_frame, key_items[row],dict_items[key_items[row]]['location'],dict_items[key_items[row]]['icon'], row)
+            make_button(my_frame, key_items[row],dict_items[key_items[row]]['location'],dict_items[key_items[row]]['icon'], row)           
         except:
             pass
     updateScrollRegion(main_frame, my_frame)
@@ -79,6 +80,7 @@ def get_websearch_makebutton(web_search_text,top,my_frame,main_frame):
     button_thread.start()
 
 timer_function = Timer(1, lambda *args: None)
+button_thread = Timer(1, lambda *args: None)
 def search_result(top, search_string, my_frame, main_frame):
 
     #If search bar is empty
@@ -126,7 +128,9 @@ def search_result(top, search_string, my_frame, main_frame):
     key_items = list(dict_items)
 
     #This thread removes the hanging of program while typing because threading does not interfere with tkinter's loop.
-    button_thread = Thread(target = process_createbutton, args = (my_frame,main_frame,dict_items, key_items))
+    global button_thread
+    button_thread.cancel()
+    button_thread = Timer(0.4,process_createbutton, [my_frame,main_frame,dict_items, key_items])
     button_thread.start()
 
 

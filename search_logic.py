@@ -9,6 +9,9 @@ import win32con
 import win32ui  
 import win32gui
 
+# from fuzzywuzzy import fuzz
+# from functools import partial
+
 from PIL import Image
 
 
@@ -154,17 +157,16 @@ def windows_exe_search_registry():
 
 def search_dict(search_string):
     """
-    Get dumped dictionary and search for substrings
-    Eg:
-    for keys in a_dict.keys():
-            if(search in keys):
-                    print(a_dict[keys])
-    """
+    Getting dumped dictionary from search_collection.bin and search for substrings
 
-    # print(os.getcwd())
+    """
     dict_file = open("search_collection.bin", "rb")
     applications_dict = pickle.load(dict_file)
     search_result = {keys : {'location':applications_dict[keys]["location"], 'icon': applications_dict[keys]["icon"] } for keys in applications_dict.keys() if search_string.lower() in keys.lower()}
+    
+    # p_ratio = partial(fuzz.partial_ratio,search_string)
+    # # print({keys:p_ratio(keys) for keys in applications_dict if p_ratio(keys) > 70})
+    # search_result= {keys : {'location':applications_dict[keys]["location"], 'icon': applications_dict[keys]["icon"] } for keys in applications_dict if p_ratio(keys) > 70}
     return(search_result)
 
 # windows_search_startmenu()
