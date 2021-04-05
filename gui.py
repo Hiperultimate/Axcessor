@@ -81,6 +81,7 @@ def open_close():
         if(win32api.GetAsyncKeyState(win32con.VK_LWIN) == -32768 and win32api.GetAsyncKeyState(win32con.VK_SHIFT) == -32768):
             if(toggling == 1):
                 toggling = 0 
+                top.withdraw()
                 search_bar.delete(0,'end')  #Deletes all text from the entry once the axcessor is minimized.
             elif(toggling == 0):
                 toggling = 1
