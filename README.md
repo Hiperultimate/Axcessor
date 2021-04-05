@@ -28,8 +28,3 @@ Web Searching <br>
 ## How to run
 1. Download and extract code ZIP file.
 2. Open gui<span>.py</span> file in your IDE and run it.
-
-## Disclaimer
-This was a solo project made by me in my free time. Future updates may or may not arrive.
-
-
