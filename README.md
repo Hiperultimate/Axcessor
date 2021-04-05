@@ -17,14 +17,19 @@ A GUI driven Windows application which lets the user search for various installe
 - To updating newly installed applications on Axcessor, just type "/rebuild/" in the search bar. 
 
 ## Showcasing Axcessor
-Searching
-<!-- ![](git_media/local_search.gif) -->
+Searching <br>
 <img src="git_media/local_search.gif"><br>
 
 <br><br>
 
 Web Searching <br>
 <img src="git_media/web_search.gif">
-<!-- ![](git_media/web_search.gif) -->
+
+## How to run
+1. Download and extract code ZIP file.
+2. Open gui<span>.py</span> file in your IDE and run it.
+
+## Disclaimer
+This was a solo project made by me in my free time. Future updates may or may not arrive.
 
 
