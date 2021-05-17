@@ -14,7 +14,7 @@ A GUI driven Windows application which lets the user do web searches or search f
 - Press win+shift key on your keyboard to open or close Axcessor.
 - Type your needed application on the search bar to get search results.
 - To web search type "s/" and the search text to get web search results.
-- To updating newly installed applications on Axcessor, just type "/rebuild/" in the search bar. 
+- For updating newly installed applications on Axcessor, just type "/rebuild/" in the search bar. 
 
 ## Showcasing Axcessor
 Searching <br>
@@ -28,4 +28,5 @@ Web Searching <br>
 ## How to run
 1. Download and extract code ZIP file.
 2. Open gui<span>.py</span> file in your IDE and run it.
-<br>Note: You would need to install all modules used in the code.
+<br>
+Note: You would need to install all modules used in the code.
